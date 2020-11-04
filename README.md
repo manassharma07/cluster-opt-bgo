@@ -1,3 +1,10 @@
+This is a FORK of the cluster-opt-bgo from PredictiveScienceLab
+
+The original implementation was in Python2, but I wanted to have it in Python3.
+Moreover, the original implementation was interfaced with ASE and using the EMT for the calculation of energies.
+
+I have interfaced it with PySCF as well so that the energies can be calculated using Quantum Chemsitry methods.
+
 # cluster-opt-bgo
 Bayesian Global Optimization for Minimum Energy Cluster Identification
 ======================================================================
