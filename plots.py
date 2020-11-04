@@ -10,7 +10,7 @@ Date:
 """
 
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import itertools
@@ -43,7 +43,7 @@ def make_ei_plot(bgo, molecule, to_file):
     ax.set_ylabel('EI', fontsize=16)
     if to_file:
         figname = os.path.join('results', 'ei_' + molecule.get_chemical_formula() + '.png')
-        print '> writing:', figname
+        print('> writing:', figname)
         plt.savefig(figname)
         plt.close(fig)
 
@@ -60,7 +60,7 @@ def make_energy_plot(bgo, molecule, to_file):
     ax.set_ylabel('Energy', fontsize=16)
     if to_file:
         figname = os.path.join('results', 'energy_' + molecule.get_chemical_formula() + '.png')
-        print '> writing:', figname
+        print('> writing:', figname)
         plt.savefig(figname)
         plt.close(fig)
 
@@ -89,13 +89,13 @@ def make_cluster_plot(bgo, molecule, to_file):
                   'Cl': 'g'}
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    for x, s in itertools.izip(bgo.best_masked_design,
+    for x, s in zip(bgo.best_masked_design,
                                molecule.get_chemical_symbols()):
         draw_sphere(ax, x, color=CPK_COLORS[s])
-    ax.set_aspect('equal', 'datalim')
+    ax.set_aspect('auto', 'datalim')
     if to_file:
         figname = os.path.join('results', 'final_cluster_' + molecule.get_chemical_formula() + '.png')
-        print '> writing:', figname
+        print('> writing:', figname)
         plt.savefig(figname)
         plt.close(fig)
 
@@ -126,9 +126,9 @@ def plot_1d_callback(bgo, molecule, interactive):
     if interactive:
         plt.show(block=True)
     else:
-        figname = os.path.join('results', 'bgo_' + 
-                                          molecule.get_chemical_formula()+ '_' 
-                                          + str(__count_callback).zfill(2) 
+        figname = os.path.join('results', 'bgo_' +
+                                          molecule.get_chemical_formula()+ '_'
+                                          + str(__count_callback).zfill(2)
                                           + '.png')
-        print '> writing:', figname
+        print('> writing:', figname)
         plt.savefig(figname)

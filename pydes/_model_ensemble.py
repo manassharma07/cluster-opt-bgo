@@ -41,7 +41,7 @@ class ModelEnsemble(object):
     # Weight corresponding to each model (normalized)
     _w = None
 
-    @property 
+    @property
     def model(self):
         """
         :getter: Get the model.
@@ -89,7 +89,7 @@ class ModelEnsemble(object):
         assert np.all(value >= 0.)
         self._w = value / np.sum(value)
 
-    @property 
+    @property
     def num_particles(self):
         """
         :getter: Get the number of particles in the ensemble.
@@ -118,7 +118,7 @@ class ModelEnsemble(object):
         Return samples of the posterior mean.
         """
         Y = []
-        for i in xrange(self.num_particles):
+        for i in range(self.num_particles):
             model = self.get_model(i)
             y = model.predict(X)[0]
             Y.append(y[:, 0])
@@ -130,7 +130,7 @@ class ModelEnsemble(object):
         Draw samples from the posterior of the ensemble.
         """
         Y = []
-        for i in xrange(self.num_particles):
+        for i in range(self.num_particles):
             model = self.get_model(i)
             y = model.posterior_samples(X, size=size).T
             Y.append(y)
@@ -155,7 +155,7 @@ class ModelEnsemble(object):
         """
         Y = []
         V = []
-        for i in xrange(self.num_particles):
+        for i in range(self.num_particles):
             y, v = self.get_model(i).predict(X)
             Y.append(y)
             V.append(v)
@@ -178,7 +178,7 @@ class ModelEnsemble(object):
         res = []
         X_ns = []   # Locations of max/min
         M_ns = []   # Values of max/min
-        for i in xrange(self.num_particles):
+        for i in range(self.num_particles):
             r, i_n, m_n = func(X, self.get_model(i), *args)
             res.append(r)
             X_ns.append(i_n)

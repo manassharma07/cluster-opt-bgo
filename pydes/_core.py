@@ -29,7 +29,8 @@ from scipy.integrate import quad
 #from choldate import choldowndate, cholupdate
 
 
-from statsmodels.sandbox.distributions.multivariate import mvnormcdf
+#from statsmodels.sandbox.distributions.multivariate import mvnormcdf
+from statsmodels.sandbox.distributions.extras import mvnormcdf
 import math
 
 
@@ -46,7 +47,7 @@ def remove(mu, S, i):
 def maxpdf(x, mu, S):
     s = np.zeros(x.shape[0])
     d = mu.shape[0]
-    for i in xrange(d):
+    for i in range(d):
         mu_i = mu[i]
         S_ii = S[i, i]
         mu_ni, S_nini = remove(mu, S, i)
@@ -54,8 +55,8 @@ def maxpdf(x, mu, S):
         mu_nii = mu_ni[:, None] + np.dot(S_ini.T, x[None, :] - mu_i) / S_ii
         S_ninii = S_nini - np.dot(S_ini, S_ini.T) / S_ii
         phi_i = norm.pdf(x, loc=mu_i, scale=np.sqrt(S_ii))
-        Phi_i = np.array([mvnormcdf(x[j], mu_nii[:, j], S_ninii) 
-                          for j in xrange(x.shape[0])])
+        Phi_i = np.array([mvnormcdf(x[j], mu_nii[:, j], S_ninii)
+                          for j in range(x.shape[0])])
         s += phi_i * Phi_i
     return s
 
@@ -91,7 +92,7 @@ def fb_expected_improvement(X_design, model, mode='min', stepsize=1e-2,
     mcmc = HMC(model, stepsize=stepsize)
     params = mcmc.sample(num_samples=num_samples)
     ei_all = []
-    for i in xrange(params.shape[0]):
+    for i in range(params.shape[0]):
         model.rbf.variance = params[i, 0]
         model.rbf.lengthscale = params[i, 1]
         ei = expected_improvement(X_design, model, mode=mode)
@@ -112,7 +113,7 @@ def kl_divergence(g1, g2):
     """
     Compute the KL divergence.
     """
-    f = lambda(x): g1.evaluate([[x]]) * np.log(g1.evaluate([[x]]) / g2.evaluate([[x]]))
+    f = lambda x: g1.evaluate([[x]]) * np.log(g1.evaluate([[x]]) / g2.evaluate([[x]]))
     return quad(f, 0, 6)
 
 
@@ -126,7 +127,7 @@ def expected_information_gain(X_design, model, num_Omegas=1000,
     """
     import matplotlib.pyplot as plt
     m_d, K_d = model.predict(X_design, full_cov=True)[:2]
-    U_d = scipy.linalg.cholesky(K_d, lower=False)    
+    U_d = scipy.linalg.cholesky(K_d, lower=False)
     Omegas = np.random.randn(X_design.shape[0], num_Omegas)
     delta_y_i = np.random.randn(num_y)
     # Find the histogram of Q the current data
@@ -151,10 +152,10 @@ def expected_information_gain(X_design, model, num_Omegas=1000,
     plt.hist(X_design[Q_d, 0], normed=True, alpha=0.5)
     plt.savefig('examples/kde_Q.png')
     plt.clf()
-    print 'Entropy:', stats.entropy(p_d)
+    print('Entropy:', stats.entropy(p_d))
     G = np.zeros((X_design.shape[0],))
     p_d += 1e-16
-    for i in xrange(X_design.shape[0]):
+    for i in range(X_design.shape[0]):
         u_di = K_d[:, i] / math.sqrt(K_d[i, i])
         u_di = u_di[:, None]
         #K_dd = K_d - np.dot(u_di, u_di.T)
@@ -176,11 +177,11 @@ def expected_information_gain(X_design, model, num_Omegas=1000,
         #print Q_dgi
         #quit()
         p_d_i = np.zeros((num_y, X_design.shape[0]))
-        for j in xrange(num_y):
+        for j in range(num_y):
             tmp = stats.itemfreq(Q_dgi[j, :])
             p_d_i[j, np.array(tmp[:, 0], dtype='int')] = tmp[:, 1] / np.sum(tmp[:, 1])
         p_d_i += 1e-16
-        G[i] = np.mean([stats.entropy(p_d_i[j, :], p_d) for j in xrange(num_y)])
+        G[i] = np.mean([stats.entropy(p_d_i[j, :], p_d) for j in range(num_y)])
         #G[i] = np.mean([-stats.entropy(p_d_i[j, :]) for j in xrange(num_y)])
         #plt.plot(X_design, S_dgi[:, :, 0], 'm', linewidth=0.5)
         #plt.plot(X_design, m_d, 'r', linewidth=2)
@@ -188,7 +189,7 @@ def expected_information_gain(X_design, model, num_Omegas=1000,
         plt.plot(X_design, np.mean(p_d_i, axis=0), 'g', linewidth=2)
         plt.savefig('examples/ig_S_' + str(i).zfill(2) + '.png')
         plt.clf()
-        print X_design[i, 0], G[i]
+        print(X_design[i, 0], G[i])
         cholupdate(U_d, u_di.flatten().copy())
     plt.plot(X_design, G)
     plt.savefig('examples/ig_KL.png')
@@ -218,7 +219,7 @@ def plot_summary(f, X_design, model, prefix, G, Gamma_name):
     #ax2.set_ylim([0., 3.])
     plt.setp(ax2.get_yticklabels(), color='g')
     png_file = prefix + '.png'
-    print 'Writing:', png_file
+    print('Writing:', png_file)
     plt.savefig(png_file)
     plt.clf()
 
@@ -270,26 +271,26 @@ def minimize(f, X_init, X_design, prefix="minimize", Gamma=expected_improvement,
     Optimize f using a limited number of evaluations.
     """
     X = X_init
-    y = np.array([f(X[i, :]) for i in xrange(X.shape[0])])
+    y = np.array([f(X[i, :]) for i in range(X.shape[0])])
     k = GPy.kern.RBF(X.shape[1], ARD=True)
-    for count in xrange(max_it):
+    for count in range(max_it):
         model = GPy.models.GPRegression(X, y, k)
         model.Gaussian_noise.variance.constrain_fixed(1e-6)
         model.optimize()
-        print str(model)
+        print(str(model))
         G = Gamma(X_design, model)
         if callback is not None:
             callback(f, X_design, model,
                      prefix + '_' + str(count).zfill(2), G, Gamma_name)
         i = np.argmax(G)
         if G[i] < tol:
-            print '*** converged'
+            print('*** converged')
             break
-        print 'I am adding:', X_design[i:(i+1), :]
-        print 'which has a G of', G[i]
+        print('I am adding:', X_design[i:(i+1), :])
+        print('which has a G of', G[i])
         X = np.vstack([X, X_design[i:(i+1), :]])
         y = np.vstack([y, f(X_design[i, :])])
-        print 'it =', count+1, ', min =', np.min(y), ' arg min =', X[np.argmin(y), :]
+        print('it =', count+1, ', min =', np.min(y), ' arg min =', X[np.argmin(y), :])
     return X, y
 
 
@@ -298,6 +299,6 @@ def maximize(f, X_init, X_design, prefix='maximize', Gamma=expected_improvement,
     """
     Maximize the function ``f``.
     """
-    f_minus = lambda(x) : -f(x)
+    f_minus = lambda x : -f(x)
     return minimize(f_minus, X_init, X_design, prefix=prefix, Gamma=Gamma,
                     Gamma_name=Gamma_name, max_it=max_it, tol=tol)

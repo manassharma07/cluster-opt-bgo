@@ -16,7 +16,7 @@ __all__ = ['sample_coordinates', 'sample_many_coordinates',
 
 
 import numpy as np
-import scipy.spatial as spt 
+import scipy.spatial as spt
 import sys
 
 
@@ -43,7 +43,7 @@ def sample_coordinates(n, box=[(0, 1), (0, 1), (0, 1)], r=0.1):
     """
     box = np.array(box)
     X = np.ndarray((n, 3))
-    for i in xrange(n):
+    for i in range(n):
         X[i, :] = _sample_one_more(X[:i, :], box, r).flatten()
     return X
 
@@ -53,7 +53,7 @@ def sample_many_coordinates(s, n, box=None, r=.3):
         #box = np.array([(0, 2 * n * 2 * r) * 3])
         box = np.array([(0, 2) * 3])
     X = np.ndarray((s, n, 3))
-    for i in xrange(s):
+    for i in range(s):
         X[i, :, :] = sample_coordinates(n, box, r)
     return X
 
@@ -74,8 +74,8 @@ def usample(L, U):
     while True:
         L_in = L.copy()
         U_in = U.copy()
-        for i in xrange(n - 1):
-            for j in xrange(i + 1, n):
+        for i in range(n - 1):
+            for j in range(i + 1, n):
                 D[i, j] = L_in[i, j] + np.random.rand() * (U_in[i, j] - L_in[i, j])
                 D[j, i] = D[i, j]
                 U_in[i, j] = D[i, j]
@@ -95,15 +95,15 @@ def usample_many(L, U, num_samples):
     """
     n = L.shape[0]
     X = np.ndarray((num_samples, n, 3))
-    D = np.ndarray((num_samples, n * (n - 1) / 2))
+    D = np.ndarray((num_samples, int(n * (n - 1) / 2)))
     t = len(str(num_samples))
-    for i in xrange(num_samples):
+    for i in range(num_samples):
         sys.stdout.write('> sampling {0:s} of {1:s}\r'.format(str(i + 1).zfill(t),
                                                               str(num_samples)))
         sys.stdout.flush()
         d, x = usample(L, U)
         d = spt.distance.squareform(d)
-        D[i, :] = d 
+        D[i, :] = d
         X[i, :, :] = x
     sys.stdout.write('\n')
     return D, X
@@ -115,9 +115,9 @@ def floyd(L, U):
     inequality.
     """
     n = L.shape[0]
-    for k in xrange(n):
-        for i in xrange(n - 1):
-            for j in xrange(i + 1, n):
+    for k in range(n):
+        for i in range(n - 1):
+            for j in range(i + 1, n):
                 if U[i, j] > U[i, k] + U[k, j]:
                     U[i, j] = U[i, k] + U[k, j]
                     U[j, i] = U[i, j]
@@ -138,18 +138,18 @@ def mme(D):
     n = D.shape[0]
     W = np.ndarray((n, n))
     d_cm = np.ndarray((n,))
-    for i in xrange(n):
-        d_cm[i] = np.sum(D[i, :] ** 2) / n 
-        for j in xrange(n):
-            for k in xrange(j + 1, n):
+    for i in range(n):
+        d_cm[i] = np.sum(D[i, :] ** 2) / n
+        for j in range(n):
+            for k in range(j + 1, n):
                 d_cm[i] -= D[j, k] ** 2 / n ** 2
-    for i in xrange(n):
-        for j in xrange(n):
+    for i in range(n):
+        for j in range(n):
             W[i, j] = .5 * (d_cm[i] + d_cm[j] - D[i, j] ** 2)
     lam, w = np.linalg.eig(W)
     lam = lam[::-1][:3]
     w = w[:, ::-1][:, :3]
     X = np.ndarray((n, 3))
-    for i in xrange(min(3, n)):
+    for i in range(min(3, n)):
         X[:, i] = np.sqrt(lam[i]) * w[:, i]
     return spt.distance.squareform(spt.distance.pdist(X)), X

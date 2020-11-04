@@ -19,7 +19,7 @@ import numpy as np
 from collections import Iterable
 import math
 import GPy
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import seaborn
 from . import expected_improvement
 from . import ModelEnsemble
@@ -72,7 +72,7 @@ class GlobalOptimizer(object):
     # Extra arguments to the acquisition function
     _af_args = None
 
-    @property 
+    @property
     def X_init(self):
         """
         :getter: Get the initial design.
@@ -104,7 +104,7 @@ class GlobalOptimizer(object):
             value = np.array(value)
         self._Y_init = value
 
-    @property 
+    @property
     def X_design(self):
         """
         :getter: Get the design.
@@ -119,21 +119,21 @@ class GlobalOptimizer(object):
         assert isinstance(value, Iterable)
         self._X_design = value
 
-    @property 
+    @property
     def idx_X_obs(self):
         """
         :getter: The indexes of currently observed design points.
         """
         return self._idx_X_obs
 
-    @property 
+    @property
     def Y_obs(self):
         """
         :getter: The values of the currently observed design points.
         """
         return self._Y_obs
 
-    @property 
+    @property
     def func(self):
         """
         :getter: Get the function we are optimizing.
@@ -155,7 +155,7 @@ class GlobalOptimizer(object):
         """
         return self._args
 
-    @property 
+    @property
     def acquisition_function(self):
         """
         :getter: Get the acquisition function.
@@ -170,28 +170,28 @@ class GlobalOptimizer(object):
         assert hasattr(value, '__call__')
         self._acquisition_function = value
 
-    @property 
+    @property
     def af_args(self):
         """
         :getter: The arguments of the acquisition function.
         """
         return self._af_args
 
-    @property 
+    @property
     def X(self):
         """
         :getter: Get all the currently observed points.
         """
         return np.vstack([self.X_init, self.X_design[self.idx_X_obs]])
 
-    @property 
+    @property
     def X_masked(self):
         """
         :getter: Get all the currently observed points.
         """
         return np.vstack([self._X_masked_init, self._X_masked_design[self.idx_X_obs]])
 
-    @property 
+    @property
     def Y(self):
         """
         :getter: Get all the currently observed objectives.
@@ -200,26 +200,26 @@ class GlobalOptimizer(object):
             return np.array(self.Y_init)
         return np.vstack([self.Y_init, self.Y_obs])
 
-    @property 
+    @property
     def best_value(self):
         """
         :getter: Get the best value.
         """
         return self.current_best_value[-1]
 
-    @property 
+    @property
     def best_index(self):
         """
         :getter: Get the current best index.
         """
         return self.current_best_index[-1]
 
-    @property 
+    @property
     def best_design(self):
         i = np.argmin(self.Y)
         return self.X[i, :]
 
-    @property 
+    @property
     def best_masked_design(self):
         i = np.argmin(self.Y)
         return self.X_masked[i, :]
@@ -266,7 +266,7 @@ class GlobalOptimizer(object):
         self.selected_index = []
         self.current_best_value = []
         self.current_best_index = []
-        for it in xrange(max_it):
+        for it in range(max_it):
             kernel = GPy.kern.RBF(self.X_init.shape[1], ARD=True)
             model = GPModelClass(self.X, self.Y, kernel)
             self.model = model
@@ -284,7 +284,7 @@ class GlobalOptimizer(object):
             self.current_best_value.append(self.Y.min())
             if it >= add_at_least and af[i] / self.af_values[0] < tol:
                 if verbose:
-                    print '*** Converged (af[i] / afmax0 = {0:1.7f}) < {1:e}'.format(af[i] / self.af_values[0], tol)
+                    print('*** Converged (af[i] / afmax0 = {0:1.7f}) < {1:e}'.format(af[i] / self.af_values[0], tol))
                 break
             self.idx_X_obs.append(i)
             if self._X_masked_design is None:
@@ -292,7 +292,7 @@ class GlobalOptimizer(object):
             else:
                 self.Y_obs.append(self.func(self._X_masked_design[i], *self.args))
             if verbose:
-                print '> Iter {0:d}, Selected struct.: {1:d}, Max EI = {2:1.4f}, Min seen energy: {4:1.3f}'.format(it, i, af[i] / self.af_values[0], self.Y_obs[-1][0], self.Y.min())
+                print('> Iter {0:d}, Selected struct.: {1:d}, Max EI = {2:1.4f}, Min seen energy: {4:1.3f}'.format(it, i, af[i] / self.af_values[0], self.Y_obs[-1][0], self.Y.min()))
             self.current_best_index.append(np.argmin(self.Y))
             if callback_func is not None:
                 callback_func(*callback_func_args)
